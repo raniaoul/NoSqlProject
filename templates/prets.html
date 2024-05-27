@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Prets</title>
+</head>
+<body>
+    <h1>Prets</h1>
+    <ul id="prets-list">
+        <!-- Les prêts seront ajoutés ici via JavaScript -->
+    </ul>
+    <script>
+        fetch('/prets')
+            .then(response => response.json())
+            .then(data => {
+                const pretsList = document.getElementById('prets-list');
+                data.forEach(pret => {
+                    const li = document.createElement('li');
+                    li.textContent = `Book ID: ${pret.book_id}, Adherent ID: ${pret.adherent_id}, Date de Pret: ${pret.date_pret}, Date de Retour: ${pret.date_retour}`;
+                    pretsList.appendChild(li);
+                });
+            });
+    </script>
+</body>
+</html>

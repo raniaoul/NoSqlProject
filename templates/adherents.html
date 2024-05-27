@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Adherents</title>
+</head>
+<body>
+    <h1>Adherents</h1>
+    <ul id="adherents-list">
+        <!-- Les adhérents seront ajoutés ici via JavaScript -->
+    </ul>
+    <script>
+        fetch('/adherents')
+            .then(response => response.json())
+            .then(data => {
+                const adherentsList = document.getElementById('adherents-list');
+                data.forEach(adherent => {
+                    const li = document.createElement('li');
+                    li.textContent = `Name: ${adherent.name}, Email: ${adherent.email}, Phone: ${adherent.phone}`;
+                    adherentsList.appendChild(li);
+                });
+            });
+    </script>
+</body>
+</html>

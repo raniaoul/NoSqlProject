@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Books</title>
+</head>
+<body>
+    <h1>Books</h1>
+    <ul id="books-list">
+        <!-- Les livres seront ajoutés ici via JavaScript -->
+    </ul>
+    <script>
+        fetch('/books')
+            .then(response => response.json())
+            .then(data => {
+                const booksList = document.getElementById('books-list');
+                data.forEach(book => {
+                    const li = document.createElement('li');
+                    li.textContent = `Title: ${book.title}, Author: ${book.author}, ISBN: ${book.isbn}`;
+                    booksList.appendChild(li);
+                });
+            });
+    </script>
+</body>
+</html>
