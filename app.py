@@ -3,6 +3,8 @@ from routes.books import books_bp
 from routes.adherents import adherents_bp
 from routes.prets import prets_bp
 from routes.auth import auth_bp
+from models.mongo_models import get_all_adherents, add_adherent, delete_all_adherents, add_pret
+
 
 app = Flask(__name__)
 
@@ -17,25 +19,24 @@ app.register_blueprint(auth_bp)
 def index():
     return render_template('index.html')
 
-# Route pour afficher les livres
+# Route pour afficher la page HTML des livres
 @app.route('/books')
 def books():
     return render_template('books.html')
 
 # Route pour afficher les adhérents
-@app.route('/adherents')
-def adherents():
+@app.route('/adherents/html')
+def adherents_page():
     return render_template('adherents.html')
 
 # Route pour afficher les prêts
-@app.route('/prets')
+@app.route('/prets/html')
 def prets():
     return render_template('prets.html')
 
 # Route pour la page de connexion
 @app.route('/login', methods=['GET'])
 def login_page():
-
     return render_template('login.html')
 
 # Traitement de la connexion
@@ -52,6 +53,33 @@ def login():
         return jsonify({"message": "Login successful"}), 200
     else:
         return jsonify({"message": "Invalid credentials"}), 401
+
+# Route pour obtenir tous les adhérents
+@app.route('/adherents', methods=['GET'])
+def get_adherents():
+    adherents = get_all_adherents()
+    return jsonify(adherents)
+
+# Route pour ajouter un adhérent
+@app.route('/adherents', methods=['POST'])
+def create_adherent():
+    adherent_data = request.json
+    add_adherent(adherent_data)
+    return jsonify({"message": "Adherent added successfully"}), 201
+
+# Route pour supprimer tous les adhérents
+@app.route('/adherents', methods=['DELETE'])
+def delete_all_adherents_route():
+    delete_count = delete_all_adherents()
+    return jsonify({"deleted_count": delete_count})
+
+# Route pour ajouter un prêt
+@app.route('/prets', methods=['POST'])
+def create_pret():
+    pret_data = request.json
+    add_pret(pret_data)
+    return jsonify({"message": "Loan added successfully"}), 201
+
 
 if __name__ == '__main__':
     app.run(debug=True)

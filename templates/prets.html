@@ -3,23 +3,252 @@
 <head>
     <meta charset="UTF-8">
     <title>Prets</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3e5d0; /* Light background color */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            color: #333; /* Dark text color */
+            position: relative;
+        }
+
+        .background-image {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .background-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.5; /* Semi-transparent background image */
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: rgba(255, 255, 255, 0.8); /* Lighten sidebar */
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #e67e22; /* Orange text color */
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin-bottom: 20px;
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            color: #333; /* Dark text color */
+            font-size: 18px;
+            transition: color 0.3s ease;
+        }
+
+        .sidebar ul li a:hover {
+            color: #e67e22; /* Orange text on hover */
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            margin: 20px 0;
+            color: #e67e22; /* Orange text color */
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #fff;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 80%;
+        }
+
+        form {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f9f9f9; /* Light background color */
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            color: #333; /* Dark text color */
+            width: 80%;
+        }
+
+        label, input {
+            margin: 5px 0;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #e67e22; /* Orange background color */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #d35400; /* Darker orange on hover */
+        }
+    </style>
 </head>
 <body>
-    <h1>Prets</h1>
-    <ul id="prets-list">
-        <!-- Les prêts seront ajoutés ici via JavaScript -->
-    </ul>
+    <div class="background-image">
+        <img src="https://images.unsplash.com/photo-1600431521340-491eca880813?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGxpYnJhcnl8ZW58MHx8MHx8fDA%3D" alt="Library Background">
+    </div>
+    <div class="sidebar">
+        <h2>Menu</h2>
+        <ul>
+            <li><a href="/books">Books</a></li>
+            <li><a href="/adherents/html">Adherents</a></li>
+            <li><a href="/prets/html">Prets</a></li>
+            <li><a href="/login">Login</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h1>Prets</h1>
+        <ul id="prets-list">
+            <!-- Les prêts seront ajoutés ici via JavaScript -->
+        </ul>
+        <form id="add-pret-form">
+            <label for="book-id">Book ID:</label>
+            <input type="text" id="book-id" name="book_id" required><br>
+            <label for="adherent-id">Adherent ID:</label>
+            <input type="text" id="adherent-id" name="adherent_id" required><br>
+            <label for="date-pret">Date de Pret:</label>
+            <input type="date" id="date-pret" name="date_pret" required><br>
+            <label for="date-retour">Date de Retour:</label>
+            <input type="date" id="date-retour" name="date_retour" required><br>
+            <button type="submit">Ajouter Pret</button>
+        </form>
+    </div>
     <script>
-        fetch('/prets')
-            .then(response => response.json())
-            .then(data => {
-                const pretsList = document.getElementById('prets-list');
-                data.forEach(pret => {
-                    const li = document.createElement('li');
-                    li.textContent = `Book ID: ${pret.book_id}, Adherent ID: ${pret.adherent_id}, Date de Pret: ${pret.date_pret}, Date de Retour: ${pret.date_retour}`;
-                    pretsList.appendChild(li);
-                });
+         function fetchAndDisplayPrets() {
+            fetch('/prets')
+                .then(response => response.json())
+                .then(data => {
+                    const pretsList = document.getElementById('prets-list');
+                    pretsList.innerHTML = ''; // Clear the list before adding new items
+                    data.forEach(pret => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            Book ID: ${pret.book_id}, Adherent ID: ${pret.adherent_id}, Date de Pret: ${pret.date_pret}, Date de Retour: ${pret.date_retour}
+                            <button onclick="editPret('${pret._id}')">Edit</button>
+                            <button onclick="deletePret('${pret._id}')">Delete</button>
+                        `;
+                        pretsList.appendChild(li);
+                    });
+                })
+                .catch(error => console.error('Erreur lors de la récupération des prêts:', error));
+        }
+
+        document.getElementById('add-pret-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            const pretData = {};
+            formData.forEach((value, key) => {
+                pretData[key] = value;
             });
+
+            fetch('/prets', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(pretData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    fetchAndDisplayPrets(); // Update the list after adding a loan successfully
+                } else {
+                    console.error('Erreur lors de l\'ajout du prêt:', response.status);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors de l\'ajout du prêt:', error);
+            });
+        });
+
+        function editPret(pretId) {
+            const newDateRetour = prompt('Enter new return date (YYYY-MM-DD):');
+            if (newDateRetour) {
+                fetch(`/prets/${pretId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ date_retour: newDateRetour })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        fetchAndDisplayPrets(); // Update the list after editing a loan successfully
+                    } else {
+                        console.error('Erreur lors de la modification du prêt:', response.status);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la modification du prêt:', error);
+                });
+            }
+        }
+
+        function deletePret(pretId) {
+            if (confirm('Are you sure you want to delete this loan?')) {
+                fetch(`/prets/${pretId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        fetchAndDisplayPrets(); // Update the list after deleting a loan successfully
+                    } else {
+                        console.error('Erreur lors de la suppression du prêt:', response.status);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la suppression du prêt:', error);
+                });
+            }
+        }
+
+        // Fetch and display loans on initial page load
+        fetchAndDisplayPrets();
     </script>
 </body>
 </html>
