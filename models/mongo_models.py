@@ -28,7 +28,10 @@ def get_all_adherents():
     return list(adherents_collection.find({}, {'_id': 0}))
 
 def get_all_prets():
-    return list(prets_collection.find())
+    prets = list(prets_collection.find())
+    for pret in prets:
+        pret['_id'] = str(pret['_id'])  # Convertir ObjectId en string pour JSON
+    return prets
 
 def delete_all_books():
     result = livres_collection.delete_many({})
@@ -44,3 +47,5 @@ def delete_pret_by_id(pret_id):
 
 def delete_all_adherents():
     adherents_collection.delete_many({})
+
+    
