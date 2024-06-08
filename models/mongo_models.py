@@ -1,5 +1,6 @@
 from config import livres_collection, adherents_collection, prets_collection, users_collection
 from bson.objectid import ObjectId
+from config import users_collection
 
 def add_book(book):
     result = livres_collection.insert_one(book)
@@ -14,8 +15,11 @@ def add_pret(pret):
     return result.inserted_id
 
 def add_user(user):
-    result = users_collection.insert_one(user)
-    return result.inserted_id
+    if 'username' in user and 'password' in user:
+        result = users_collection.insert_one(user)
+        return result.inserted_id
+    else:
+        raise ValueError("User data must include 'username' and 'password'")
 
 def authenticate_user(username, password):
     user = users_collection.find_one({"username": username, "password": password})
@@ -48,4 +52,11 @@ def delete_pret_by_id(pret_id):
 def delete_all_adherents():
     adherents_collection.delete_many({})
 
-    
+def add_user(user):
+    result = users_collection.insert_one(user)
+    return result.inserted_id
+
+def authenticate_user(username, password):
+    user = users_collection.find_one({"username": username, "password": password})
+    return user is not None
+

@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, render_template
-from models.mongo_models import add_adherent, get_all_adherents, delete_adherent_by_id
+from models.mongo_models import add_adherent, get_all_adherents, delete_adherent_by_id, adherents_collection
 
 adherents_bp = Blueprint('adherents', __name__)
 
@@ -30,5 +30,12 @@ def delete_adherent(id):
 def get_adherents_html():
     adherents = get_all_adherents()
     return render_template('adherents.html', adherents=adherents)
+
+def get_all_adherents():
+    adherents = list(adherents_collection.find())
+    for adherent in adherents:
+        adherent['_id'] = str(adherent['_id'])
+    return adherents
+
 
 

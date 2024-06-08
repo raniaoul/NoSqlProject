@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Prets</title>
+    <title>Prêts</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -96,6 +96,9 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 800px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         form {
@@ -108,7 +111,7 @@
             max-width: 800px;
         }
 
-        form input, form button {
+        form input, form button, form select {
             padding: 10px;
             margin: 5px;
             width: calc(100% - 20px);
@@ -127,31 +130,45 @@
         form button:hover {
             background-color: #d35400; /* Darker orange button on hover */
         }
+
+        .delete-button {
+            background-color: #e74c3c; /* Red background color */
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .delete-button:hover {
+            background-color: #c0392b; /* Darker red on hover */
+        }
     </style>
 </head>
 <body>
     <div class="background-image">
         <img src="https://images.unsplash.com/photo-1600431521340-491eca880813?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGxpYnJhcnl8ZW58MHx8MHx8fDA%3D" alt="Library Background">
     </div>
-    </div>
 
     <div class="sidebar">
         <h2>Menu</h2>
         <ul>
-            <li><a href="/">Accueil</a></li>
             <li><a href="/books">Livres</a></li>
             <li><a href="/adherents/html">Adhérents</a></li>
-            <li><a href="/prets/html">Prêts</a></li>
-            <li><a href="/login">Login</a></li>
+            <li><a href="/prets/html">books</a></li>
+            <li><a href="">Logout</a></li>
         </ul>
     </div>
 
     <div class="main-content">
-        <h1>Prets</h1>
+        <h1>Prêts</h1>
 
         <form id="pret-form">
             <input type="text" id="book_id" name="book_id" placeholder="Book ID" required>
-            <input type="text" id="adherent_id" name="adherent_id" placeholder="Adherent ID" required>
+            <select id="adherent_id" name="adherent_id" required>
+                <option value="" disabled selected>Choisissez un adhérent</option>
+                <!-- Insérer ici les options générées dynamiquement -->
+            </select>
             <input type="date" id="date_pret" name="date_pret" placeholder="Date de Pret" required>
             <input type="date" id="date_retour" name="date_retour" placeholder="Date de Retour" required>
             <button type="submit">Ajouter Pret</button>
@@ -173,43 +190,76 @@
                         pretsList.innerHTML = '';
                         data.forEach(pret => {
                             const li = document.createElement('li');
-                            li.textContent = `Book ID: ${pret.book_id}, Adherent ID: ${pret.adherent_id}, Date de Pret: ${pret.date_pret}, Date de Retour: ${pret.date_retour}`;
-                            pretsList.appendChild(li);
-                        });
-                    })
-                    .catch(error => console.error('Erreur lors de la récupération des prêts:', error));
-            }
-
-            document.getElementById('pret-form').addEventListener('submit', function(event) {
-                event.preventDefault();
-                const formData = new FormData(event.target);
-                const data = {};
-                formData.forEach((value, key) => data[key] = value);
-
-                fetch('/prets', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                })
+                            li.innerHTML = `
+                                Book ID: ${pret.book_id}, Adherent ID: ${pret.adherent_id}, Date de Pret: ${pret.date_pret}, Date de Retour: ${pret.date_retour}
+<button class="delete-button" onclick="deletePret('${pret._id}')">Supprimer</button>
+`;
+pretsList.appendChild(li);
+});
+})
+.catch(error => console.error('Erreur lors de la récupération des prêts:', error));
+}
+function fetchAndDisplayAdherents() {
+            fetch('/adherents')
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('Erreur lors de l\'ajout du prêt');
+                        throw new Error('Erreur lors de la récupération des adhérents');
                     }
                     return response.json();
                 })
                 .then(data => {
-                    console.log('Success:', data);
-                    fetchAndDisplayPrets();
-                    event.target.reset(); // Reset the form after successful submission
+                    const adherentSelect = document.getElementById('adherent_id');
+                    adherentSelect.innerHTML = '<option value="" disabled selected>Choisissez un adhérent</option>';
+                    data.forEach(adherent => {
+                        adherentSelect.innerHTML += `<option value="${adherent._id}">${adherent.name}</option>`;
+                    });
                 })
-                .catch(error => console.error('Erreur lors de l\'ajout du prêt:', error));
-            });
+                .catch(error => console.error('Erreur lors de la récupération des adhérents:', error));
+        }
 
-            // Fetch and display loans on initial page load
-            fetchAndDisplayPrets();
-        </script>
-    </div>
-</body>
-</html>
+        document.getElementById('pret-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = {};
+            formData.forEach((value, key) => data[key] = value);
+
+            fetch('/prets', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur lors de l\'ajout du prêt');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Success:', data);
+                fetchAndDisplayPrets();
+                event.target.reset(); // Reset the form after successful submission
+            })
+            .catch(error => console.error('Erreur lors de l\'ajout du prêt:', error));
+        });
+
+        function deletePret(id) {
+            fetch(`/prets/${id}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la suppression du prêt');
+                }
+                fetchAndDisplayPrets();
+            })
+            .catch(error => console.error('Erreur lors de la suppression du prêt:', error));
+        }
+
+        // Fetch and display loans and adherents on initial page load
+        fetchAndDisplayPrets();
+        fetchAndDisplayAdherents();
+    </script>
+</div>
+

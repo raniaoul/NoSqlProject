@@ -30,11 +30,13 @@ def create_book():
     book_data = request.json
     inserted_id = add_book(book_data)  # Get the inserted ObjectId
     book_data["_id"] = str(inserted_id)  # Convert ObjectId to string
-    sync_book_to_neo4j(book_data)
+    sync_book_to_neo4j(book_data)  # Sync book to Neo4j
     return jsonify({"message": "Book added successfully"}), 201
+
 
 # This route deletes all books
 @books_bp.route('/api/books', methods=['DELETE'])
 def delete_books():
     deleted_count = delete_all_books()
     return jsonify({"message": f"Deleted {deleted_count} books"}), 200
+

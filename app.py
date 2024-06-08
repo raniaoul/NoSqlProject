@@ -80,6 +80,27 @@ def create_pret():
     add_pret(pret_data)
     return jsonify({"message": "Loan added successfully"}), 201
 
+# Route pour afficher la page d'ajout de livre
+@app.route('/addBook')
+def add_book_page():
+    return render_template('addBook.html')
+
+@app.route('/api/books', methods=['POST'])
+def add_book():
+    book_data = request.json
+    # Ajoutez ici le code pour enregistrer les données du livre dans la base de données
+    # Exemple de code pour ajouter un livre à une base de données fictive
+    new_book = {
+        "title": book_data.get('title'),
+        "author": book_data.get('author'),
+        "isbn": book_data.get('isbn'),
+        "image_url": book_data.get('image_url')
+    }
+    # Enregistrement du livre (exemple fictif)
+    # books_collection.insert_one(new_book)
+    return jsonify({"message": "Book added successfully"}), 201
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

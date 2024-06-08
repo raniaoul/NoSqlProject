@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
+    <title>Register</title>
     <style>
         body {
             margin: 0;
             font-family: Arial, sans-serif;
         }
 
-        .login-container {
+        .register-container {
             position: relative;
             width: 100%;
             height: 100vh;
@@ -33,7 +33,7 @@
             opacity: 0.5;
         }
 
-        .login-box {
+        .register-box {
             position: relative;
             width: 400px;
             padding: 20px;
@@ -43,16 +43,16 @@
             text-align: center;
         }
 
-        .login-header {
+        .register-header {
             margin-bottom: 20px;
         }
 
-        .login-header img {
+        .register-header img {
             width: 100px;
             height: auto;
         }
 
-        .login-header h2 {
+        .register-header h2 {
             margin: 0;
             font-size: 24px;
             color: #e67e22;
@@ -92,37 +92,28 @@
             background-color: #d35400;
         }
 
-        /* Styles pour le lien de création de compte */
-        .register-link {
-            margin-top: 15px;
-            color: #333;
-            text-decoration: none;
-            font-size: 14px;
-            display: inline-block;
-        }
-
-        .register-link:hover {
-            text-decoration: underline;
-        }
-
-        /* Styles pour le message d'erreur */
-        .error-message {
-            color: red;
+        /* Styles for success message */
+        .success-message {
+            color: green;
             margin-top: 10px;
+        }
+
+        .login-link {
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
+    <div class="register-container">
         <div class="background-image">
             <img src="https://images.unsplash.com/photo-1600431521340-491eca880813?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGxpYnJhcnl8ZW58MHx8MHx8fDA%3D" alt="Library Background">
         </div>
-        <div class="login-box">
-            <div class="login-header">
+        <div class="register-box">
+            <div class="register-header">
                 <img src="https://static.scientificamerican.com/sciam/cache/file/1DDFE633-2B85-468D-B28D05ADAE7D1AD8_source.jpg?w=1200" alt="Library Logo">
                 <h2>Library Management System</h2>
             </div>
-            <form id="login-form">
+            <form id="register-form">
                 <div class="input-group">
                     <label for="username">User Name:</label>
                     <input type="text" id="username" name="username" required>
@@ -131,42 +122,40 @@
                     <label for="password">Password:</label>
                     <input type="password" id="password" name="password" required>
                 </div>
-                <button type="submit">Login</button>
+                <button type="submit">Register</button>
             </form>
-            <!-- Message d'erreur -->
-            <div class="error-message" id="error-message" style="display: none;">
-                Invalid credentials, please try again.
+            <!-- Success message -->
+            <div class="success-message" id="success-message" style="display: none;">
+                Account created successfully! <a href="/login" class="login-link">Return to login page</a>
             </div>
-            <!-- Lien pour la création de compte -->
-            <a href="/register" class="register-link">Create an account</a>
         </div>
     </div>
 
     <script>
-        document.getElementById('login-form').addEventListener('submit', function(event) {
+        document.getElementById('register-form').addEventListener('submit', function(event) {
             event.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+            
+            const formData = {
+                username: document.getElementById('username').value,
+                password: document.getElementById('password').value
+            };
 
-            fetch('/login', {
+            fetch('/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ username, password })
+                body: JSON.stringify(formData)
             })
             .then(response => response.json())
             .then(data => {
-                if (data.message === 'Login successful') {
-                    window.location.href = '/adherents/html';
+                if (data.message === "User registered successfully") {
+                    document.getElementById('success-message').style.display = 'block';
                 } else {
-                    document.getElementById('error-message').style.display = 'block';
+                    alert(data.message);
                 }
             })
-            .catch(error => {
-                console.error('Error:', error);
-                document.getElementById('error-message').style.display = 'block';
-            });
+            .catch(error => console.error('Error:', error));
         });
     </script>
 </body>

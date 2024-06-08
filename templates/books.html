@@ -128,10 +128,7 @@
     <div class="sidebar">
         <h2>Menu</h2>
         <ul>
-            <li><a href="/">Accueil</a></li>
             <li><a href="/books">Books</a></li>
-            <li><a href="/adherents/html">Adherents</a></li>
-            <li><a href="/prets/html">Prets</a></li>
             <li><a href="/login">Login</a></li>
         </ul>
     </div>
@@ -142,22 +139,25 @@
         </div>
     </div>
     <script>
-        fetch('/api/books')
-            .then(response => response.json())
-            .then(data => {
-                const booksList = document.getElementById('books-list');
-                data.forEach(book => {
-                    const bookCard = document.createElement('div');
-                    bookCard.className = 'book-card';
-                    bookCard.innerHTML = `
-                        <img src="${book.image_url}" alt="${book.title}">
-                        <p><strong>Title:</strong> ${book.title}</p>
-                        <p><strong>Author:</strong> ${book.author}</p>
-                        <p><strong>ISBN:</strong> ${book.isbn}</p>
-                    `;
-                    booksList.appendChild(bookCard);
-                });
+    fetch('/api/books')
+        .then(response => response.json())
+        .then(data => {
+            const booksList = document.getElementById('books-list');
+            data.forEach(book => {
+                const bookCard = document.createElement('div');
+                bookCard.className = 'book-card';
+                bookCard.innerHTML = `
+                    <img src="${book.image_url || 'default_image_url.jpg'}" alt="${book.title}">
+                    <p><strong>Title:</strong> ${book.title}</p>
+                    <p><strong>Author:</strong> ${book.author}</p>
+                    <p><strong>ISBN:</strong> ${book.isbn}</p>
+                `;
+                booksList.appendChild(bookCard);
             });
+        })
+        .catch(error => console.error('Error fetching books:', error));
+
+
     </script>
 </body>
 </html>
