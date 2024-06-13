@@ -4,18 +4,24 @@ from models.neo4j_models import sync_book_to_neo4j
 from bson import ObjectId  # Add this import
 
 books_bp = Blueprint('books', __name__)
-
 def serialize_book(book):
     """Convert MongoDB book document to JSON-serializable format."""
-    serialized_book = {
-        "title": book["title"],
-        "author": book["author"],
-        "isbn": book["isbn"],
-        "image_url": book.get("image_url")  # Include the image_url field
-    }
+    serialized_book = {}
+    
+    if "title" in book:
+        serialized_book["title"] = book["title"]
+    if "author" in book:
+        serialized_book["author"] = book["author"]
+    if "isbn" in book:
+        serialized_book["isbn"] = book["isbn"]
+    if "image_url" in book:
+        serialized_book["image_url"] = book["image_url"]
+
     if "_id" in book:
         serialized_book["id"] = str(book["_id"])  # Convert ObjectId to string
+
     return serialized_book
+
 
 # This route returns JSON data
 @books_bp.route('/api/books', methods=['GET'])
